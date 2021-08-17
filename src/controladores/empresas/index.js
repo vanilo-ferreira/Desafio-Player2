@@ -1,26 +1,28 @@
 const knex = require('../../conexao');
 const axios = require('axios');
-const bcrypt = require('bcrypt');
 
 const cadastrarEmpresa = async (req, res) => {
-
+    const { id } = req.usuario;
     const { cnpj } = req.body;
 
-
-    //brasilApiResposta 
-    const companyEnrichmentResponse = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`)
-    .then(res.status(400)
-    .json("DIGITE UM CNPJ VÁLIDO: CNPJ NÃO CADASTRADO NA BRASIL API"));
-
     try {
+        //brasilApiResposta 
+        const companyEnrichmentResponse = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+        
+        const empresaCadastrada = await knex('empresa').where({ cnpj }).first();
+
+        if (empresaCadastrada) {
+            return res.status(400).json("O CNPJ já possui cadastro em nosso sistema");
+        }
 
         const cadastrandoEmpresa = await knex('empresa')
             .insert({
+                usuario_id: id,
                 cnpj: companyEnrichmentResponse.data.cnpj,
                 identificador_matriz_filial: companyEnrichmentResponse.data.identificador_matriz_filial,
                 descricao_matriz_filial: companyEnrichmentResponse.data.descricao_matriz_filial,
                 razao_social: companyEnrichmentResponse.data.razao_social,
-                nome_fantasia: companyEnrichmentResponse.data. nome_fantasia,
+                nome_fantasia: companyEnrichmentResponse.data.nome_fantasia,
                 situacao_cadastral: companyEnrichmentResponse.data.situacao_cadastral,
                 descricao_situacao_cadastral: companyEnrichmentResponse.data.descricao_situacao_cadastral,
                 data_situacao_cadastral: companyEnrichmentResponse.data.data_situacao_cadastral,
@@ -55,33 +57,34 @@ const cadastrarEmpresa = async (req, res) => {
             }).returning('*');;
 
 
-    if (companyEnrichmentResponse.data.cnaes_secundarias) {
-        for (const company of companyEnrichmentResponse.data.cnaes_secundarias) {
-            company.cnpj = cadastrandoEmpresa[0].cnpj;
+        if (companyEnrichmentResponse.data.cnaes_secundarias) {
+            for (const company of companyEnrichmentResponse.data.cnaes_secundarias) {
+                company.cnpj = cadastrandoEmpresa[0].cnpj;
+            }
+
+            const empresas = await knex('cnaes_secundarias')
+                .insert(
+                    companyEnrichmentResponse.data.cnaes_secundarias
+                );
         }
 
-        const empresas = await knex('cnaes_secundarias')
-            .insert(
-                companyEnrichmentResponse.data.cnaes_secundarias
-            );
-    }
+        if (companyEnrichmentResponse.data.qsa) {
+            for (const company of companyEnrichmentResponse.data.qsa) {
+                company.cnpj = cadastrandoEmpresa[0].cnpj;
+            }
 
-    if (companyEnrichmentResponse.data.qsa) {
-        for (const company of companyEnrichmentResponse.data.qsa) {
-            company.cnpj = cadastrandoEmpresa[0].cnpj;
+            const qsa = await knex('qsa')
+                .insert(
+                    companyEnrichmentResponse.data.qsa
+                );
         }
 
-        const qsa = await knex('qsa')
-            .insert(
-                companyEnrichmentResponse.data.qsa
-            );
+        //RETORNAR DADOS DA EMPRESA
+        return res.json("Cadastrada");
+
+    } catch (error) {
+        return res.status(400).json(error.message);
     }
-
-    return res.json("Cadastrada");
-
-} catch (error) {
-    return res.status(400).json(error.message);
-}
 }
 
 module.exports = {
