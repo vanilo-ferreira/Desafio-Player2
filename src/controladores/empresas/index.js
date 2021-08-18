@@ -8,7 +8,7 @@ const cadastrarEmpresa = async (req, res) => {
     try {
         //brasilApiResposta 
         const companyEnrichmentResponse = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
-        
+
         const empresaCadastrada = await knex('empresa').where({ cnpj }).first();
 
         if (empresaCadastrada) {
@@ -87,6 +87,123 @@ const cadastrarEmpresa = async (req, res) => {
     }
 }
 
+const listarTodasEmpresas = async (req, res) => {
+
+    const { offset } = req.query;
+    const listaDeEmpresas = offset ? offset : 0;
+
+    try {
+
+        const empresas = await knex('empresa')
+            .select('*')
+            .limit(10)
+            .offset(listaDeEmpresas);
+
+        if (!empresas) {
+            return res.status(404).json('Empresas não encontradas');
+        }
+
+        for (empresa of empresas) {
+
+            const qsa = await knex('qsa')
+                .where({ cnpj: empresa.cnpj })
+                .select("*");
+            empresa.qsa = qsa;
+
+            const cnaesSecundarias = await knex('cnaes_secundarias')
+                .where({ cnpj: empresa.cnpj })
+                .select("*");
+            empresa.cnaes_secundarias = cnaesSecundarias;
+        }
+        return res.status(200).json(empresas);
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+
+}
+
+const obterMinhasEmpresas = async (req, res) => {
+
+    const { id } = req.usuario;
+    const { offset } = req.query;
+    const listaDeEmpresas = offset ? offset : 0;
+
+    try {
+
+        const empresas = await knex('empresa')
+            .select('*')
+            .where({ usuario_id: id })
+            .limit(10)
+            .offset(listaDeEmpresas);
+
+        if (!empresas) {
+            return res.status(404).json('Empresas não encontradas');
+        }
+
+        for (empresa of empresas) {
+
+            const qsa = await knex('qsa')
+                .where({ cnpj: empresa.cnpj })
+                .select("*");
+            empresa.qsa = qsa;
+
+            const cnaesSecundarias = await knex('cnaes_secundarias')
+                .where({ cnpj: empresa.cnpj })
+                .select("*");
+            empresa.cnaes_secundarias = cnaesSecundarias;
+        }
+        return res.status(200).json(empresas);
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+
+}
+
+const excluirEmpresa = async (req, res) => {
+    
+    const { usuario } = req;
+    const { id } = req.params;
+
+    try {
+
+        const empresaEncontrada = await knex('empresa')
+            .where({id, usuario_id: usuario.id })
+            .first();
+
+        if (!empresaEncontrada) {
+            return res.status(404).json('Empresa não encontrada');
+        }
+
+        const qsaExcluida = await knex('qsa')
+        .where({cnpj : empresaEncontrada.cnpj})
+        .del();
+
+        const empresaExcluida2 = await knex('cnaes_secundarias')
+        .where({cnpj : empresaEncontrada.cnpj})
+        .del();
+
+        const empresaExcluida = await knex('empresa').where({
+            id,
+            usuario_id: usuario.id
+        }).del();
+
+        if (!empresaExcluida) {
+            return res.status(400).json("A empresa não foi excluída");
+        }
+
+        return res.status(200).json('Empresa excluida com sucesso');
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+
+}
+
 module.exports = {
-    cadastrarEmpresa
+    cadastrarEmpresa,
+    listarTodasEmpresas,
+    obterMinhasEmpresas,
+    excluirEmpresa
 }

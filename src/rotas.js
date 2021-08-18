@@ -6,7 +6,6 @@ const verificarLogin = require('./filtros/verificaLogin/index');
 
 const rotas = express();
 
-
 // cadastro de usuario
 rotas.post('/cadastrarUsuario', usuarios.cadastrarUsuario);
 
@@ -18,5 +17,8 @@ rotas.use(verificarLogin.verificarLogin);
 
 //Empresas
 rotas.post('/empresas', empresas.cadastrarEmpresa);
+rotas.get('/empresas', empresas.listarTodasEmpresas);
+rotas.get('/minhasEmpresas', empresas.obterMinhasEmpresas);
+rotas.delete('/excluirEmpresa/:id', empresas.excluirEmpresa);
 
 module.exports = rotas;
