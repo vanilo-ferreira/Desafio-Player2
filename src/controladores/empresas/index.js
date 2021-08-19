@@ -6,8 +6,8 @@ const cadastrarEmpresa = async (req, res) => {
     const { cnpj } = req.body;
 
     try {
-        //brasilApiResposta 
-        const companyEnrichmentResponse = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+
+        const respostaBrasilApi = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
 
         const empresaCadastrada = await knex('empresa').where({ cnpj }).first();
 
@@ -18,69 +18,68 @@ const cadastrarEmpresa = async (req, res) => {
         const cadastrandoEmpresa = await knex('empresa')
             .insert({
                 usuario_id: id,
-                cnpj: companyEnrichmentResponse.data.cnpj,
-                identificador_matriz_filial: companyEnrichmentResponse.data.identificador_matriz_filial,
-                descricao_matriz_filial: companyEnrichmentResponse.data.descricao_matriz_filial,
-                razao_social: companyEnrichmentResponse.data.razao_social,
-                nome_fantasia: companyEnrichmentResponse.data.nome_fantasia,
-                situacao_cadastral: companyEnrichmentResponse.data.situacao_cadastral,
-                descricao_situacao_cadastral: companyEnrichmentResponse.data.descricao_situacao_cadastral,
-                data_situacao_cadastral: companyEnrichmentResponse.data.data_situacao_cadastral,
-                motivo_situacao_cadastral: companyEnrichmentResponse.data.motivo_situacao_cadastral,
-                nome_cidade_exterior: companyEnrichmentResponse.data.nome_cidade_exterior,
-                codigo_natureza_juridica: companyEnrichmentResponse.data.codigo_natureza_juridica,
-                data_inicio_atividade: companyEnrichmentResponse.data.data_inicio_atividade,
-                cnae_fiscal: companyEnrichmentResponse.data.cnae_fiscal,
-                cnae_fiscal_descricao: companyEnrichmentResponse.data.cnae_fiscal_descricao,
-                descricao_tipo_logradouro: companyEnrichmentResponse.data.descricao_tipo_logradouro,
-                logradouro: companyEnrichmentResponse.data.logradouro,
-                numero: companyEnrichmentResponse.data.numero,
-                complemento: companyEnrichmentResponse.data.complemento,
-                bairro: companyEnrichmentResponse.data.bairro,
-                cep: companyEnrichmentResponse.data.cep,
-                uf: companyEnrichmentResponse.data.uf,
-                codigo_municipio: companyEnrichmentResponse.data.codigo_municipio,
-                municipio: companyEnrichmentResponse.data.municipio,
-                ddd_telefone_1: companyEnrichmentResponse.data.ddd_telefone_1,
-                ddd_telefone_2: companyEnrichmentResponse.data.ddd_telefone_2,
-                ddd_fax: companyEnrichmentResponse.data.ddd_fax,
-                qualificacao_do_responsavel: companyEnrichmentResponse.data.qualificacao_do_responsavel,
-                capital_social: companyEnrichmentResponse.data.capital_social,
-                porte: companyEnrichmentResponse.data.porte,
-                descricao_porte: companyEnrichmentResponse.data.descricao_porte,
-                opcao_pelo_simples: companyEnrichmentResponse.data.opcao_pelo_simples,
-                data_opcao_pelo_simples: companyEnrichmentResponse.data.data_opcao_pelo_simples,
-                data_exclusao_do_simples: companyEnrichmentResponse.data.data_exclusao_do_simples,
-                opcao_pelo_mei: companyEnrichmentResponse.data.opcao_pelo_mei,
-                situacao_especial: companyEnrichmentResponse.data.situacao_especial,
-                data_situacao_especial: companyEnrichmentResponse.data.data_situacao_especial
+                cnpj: respostaBrasilApi.data.cnpj,
+                identificador_matriz_filial: respostaBrasilApi.data.identificador_matriz_filial,
+                descricao_matriz_filial: respostaBrasilApi.data.descricao_matriz_filial,
+                razao_social: respostaBrasilApi.data.razao_social,
+                nome_fantasia: respostaBrasilApi.data.nome_fantasia,
+                situacao_cadastral: respostaBrasilApi.data.situacao_cadastral,
+                descricao_situacao_cadastral: respostaBrasilApi.data.descricao_situacao_cadastral,
+                data_situacao_cadastral: respostaBrasilApi.data.data_situacao_cadastral,
+                motivo_situacao_cadastral: respostaBrasilApi.data.motivo_situacao_cadastral,
+                nome_cidade_exterior: respostaBrasilApi.data.nome_cidade_exterior,
+                codigo_natureza_juridica: respostaBrasilApi.data.codigo_natureza_juridica,
+                data_inicio_atividade: respostaBrasilApi.data.data_inicio_atividade,
+                cnae_fiscal: respostaBrasilApi.data.cnae_fiscal,
+                cnae_fiscal_descricao: respostaBrasilApi.data.cnae_fiscal_descricao,
+                descricao_tipo_logradouro: respostaBrasilApi.data.descricao_tipo_logradouro,
+                logradouro: respostaBrasilApi.data.logradouro,
+                numero: respostaBrasilApi.data.numero,
+                complemento: respostaBrasilApi.data.complemento,
+                bairro: respostaBrasilApi.data.bairro,
+                cep: respostaBrasilApi.data.cep,
+                uf: respostaBrasilApi.data.uf,
+                codigo_municipio: respostaBrasilApi.data.codigo_municipio,
+                municipio: respostaBrasilApi.data.municipio,
+                ddd_telefone_1: respostaBrasilApi.data.ddd_telefone_1,
+                ddd_telefone_2: respostaBrasilApi.data.ddd_telefone_2,
+                ddd_fax: respostaBrasilApi.data.ddd_fax,
+                qualificacao_do_responsavel: respostaBrasilApi.data.qualificacao_do_responsavel,
+                capital_social: respostaBrasilApi.data.capital_social,
+                porte: respostaBrasilApi.data.porte,
+                descricao_porte: respostaBrasilApi.data.descricao_porte,
+                opcao_pelo_simples: respostaBrasilApi.data.opcao_pelo_simples,
+                data_opcao_pelo_simples: respostaBrasilApi.data.data_opcao_pelo_simples,
+                data_exclusao_do_simples: respostaBrasilApi.data.data_exclusao_do_simples,
+                opcao_pelo_mei: respostaBrasilApi.data.opcao_pelo_mei,
+                situacao_especial: respostaBrasilApi.data.situacao_especial,
+                data_situacao_especial: respostaBrasilApi.data.data_situacao_especial
             }).returning('*');;
 
 
-        if (companyEnrichmentResponse.data.cnaes_secundarias) {
-            for (const company of companyEnrichmentResponse.data.cnaes_secundarias) {
+        if (respostaBrasilApi.data.cnaes_secundarias) {
+            for (const company of respostaBrasilApi.data.cnaes_secundarias) {
                 company.cnpj = cadastrandoEmpresa[0].cnpj;
             }
 
             const empresas = await knex('cnaes_secundarias')
                 .insert(
-                    companyEnrichmentResponse.data.cnaes_secundarias
+                    respostaBrasilApi.data.cnaes_secundarias
                 );
         }
 
-        if (companyEnrichmentResponse.data.qsa) {
-            for (const company of companyEnrichmentResponse.data.qsa) {
+        if (respostaBrasilApi.data.qsa) {
+            for (const company of respostaBrasilApi.data.qsa) {
                 company.cnpj = cadastrandoEmpresa[0].cnpj;
             }
 
             const qsa = await knex('qsa')
                 .insert(
-                    companyEnrichmentResponse.data.qsa
+                    respostaBrasilApi.data.qsa
                 );
         }
 
-        //RETORNAR DADOS DA EMPRESA
-        return res.json("Cadastrada");
+        return res.json("A empresa foi cadastrada com sucesso!");
 
     } catch (error) {
         return res.status(400).json(error.message);
@@ -161,15 +160,179 @@ const obterMinhasEmpresas = async (req, res) => {
 
 }
 
+const atualizarEmpresa = async (req, res) => {
+
+    const { usuario } = req;
+    const { id } = req.params;
+    const {
+        identificador_matriz_filial,
+        descricao_matriz_filial,
+        razao_social,
+        nome_fantasia,
+        situacao_cadastral,
+        descricao_situacao_cadastral,
+        data_situacao_cadastral,
+        motivo_situacao_cadastral,
+        nome_cidade_exterior,
+        codigo_natureza_juridica,
+        data_inicio_atividade,
+        cnae_fiscal,
+        cnae_fiscal_descricao,
+        descricao_tipo_logradouro,
+        logradouro,
+        numero,
+        complemento,
+        bairro,
+        cep,
+        uf,
+        codigo_municipio,
+        municipio,
+        ddd_telefone_1,
+        ddd_telefone_2,
+        ddd_fax,
+        qualificacao_do_responsavel,
+        capital_social,
+        porte,
+        descricao_porte,
+        opcao_pelo_simples,
+        data_opcao_pelo_simples,
+        data_exclusao_do_simples,
+        opcao_pelo_mei,
+        situacao_especial,
+        data_situacao_especial,
+        identificador_de_socio,
+        nome_socio,
+        cnpj_cpf_do_socio,
+        codigo_qualificacao_socio,
+        percentual_capital_social,
+        data_entrada_sociedade,
+        cpf_representante_legal,
+        nome_representante_legal,
+        codigo_qualificacao_representante_legal,
+        codigo,
+        descricao } = req.body;
+    const { qsa_id, cnaes_id } = req.body;
+
+    try {
+
+        const empresaEncontrada = await knex('empresa')
+            .where({ id, usuario_id: usuario.id })
+            .first();
+
+        if (!empresaEncontrada) {
+            return res.status(404).json('Empresa não encontrada!');
+        }
+
+        const atualizandoEmpresa = await knex('empresa')
+            .where({ id })
+            .update({
+                identificador_matriz_filial,
+                descricao_matriz_filial,
+                razao_social,
+                nome_fantasia,
+                situacao_cadastral,
+                descricao_situacao_cadastral,
+                data_situacao_cadastral,
+                motivo_situacao_cadastral,
+                nome_cidade_exterior,
+                codigo_natureza_juridica,
+                data_inicio_atividade,
+                cnae_fiscal,
+                cnae_fiscal_descricao,
+                descricao_tipo_logradouro,
+                logradouro,
+                numero,
+                complemento,
+                bairro,
+                cep,
+                uf,
+                codigo_municipio,
+                municipio,
+                ddd_telefone_1,
+                ddd_telefone_2,
+                ddd_fax,
+                qualificacao_do_responsavel,
+                capital_social,
+                porte,
+                descricao_porte,
+                opcao_pelo_simples,
+                data_opcao_pelo_simples,
+                data_exclusao_do_simples,
+                opcao_pelo_mei,
+                situacao_especial,
+                data_situacao_especial
+            });
+
+        if (!atualizandoEmpresa) {
+            return res.status(400).json("Os dados da empresa não foram atualizados");
+        }
+        
+        if (qsa_id) {
+            const qsaEncontrada = await knex('qsa')
+                .where({ id: qsa_id })
+                .first();
+
+            if (qsaEncontrada.cnpj !== empresaEncontrada.cnpj) {
+                return res.status(404).json('A qsa é inexistente ou não está registrada a sua empresa!');
+            }
+
+            if (!qsaEncontrada) {
+                return res.status(404).json('Empresa não encontrada!');
+            }
+
+            const qsaAtualizada = await knex('qsa')
+                .where({ id: qsaEncontrada.id })
+                .update({
+                    identificador_de_socio,
+                    nome_socio,
+                    cnpj_cpf_do_socio,
+                    codigo_qualificacao_socio,
+                    percentual_capital_social,
+                    data_entrada_sociedade,
+                    cpf_representante_legal,
+                    nome_representante_legal,
+                    codigo_qualificacao_representante_legal
+                });
+        }
+
+        if (cnaes_id) {
+            const cnaesEncontrada = await knex('cnaes_secundarias')
+                .where({ id: cnaes_id })
+                .first();
+
+            if (cnaesEncontrada.cnpj !== empresaEncontrada.cnpj) {
+                return res.status(404).json('A qsa é inexistente ou não está registrada a sua empresa!');
+            }
+
+            if (!cnaesEncontrada) {
+                return res.status(404).json('Empresa não encontrada!');
+            }
+
+            const cnaesAtualizada = await knex('cnaes_secundarias')
+                .where({ id: cnaesEncontrada.id })
+                .update({
+                    codigo,
+                    descricao
+                });
+        }
+
+        return res.status(200).json('Empresa atualizada com sucesso');
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+
+}
+
 const excluirEmpresa = async (req, res) => {
-    
+
     const { usuario } = req;
     const { id } = req.params;
 
     try {
 
         const empresaEncontrada = await knex('empresa')
-            .where({id, usuario_id: usuario.id })
+            .where({ id, usuario_id: usuario.id })
             .first();
 
         if (!empresaEncontrada) {
@@ -177,12 +340,12 @@ const excluirEmpresa = async (req, res) => {
         }
 
         const qsaExcluida = await knex('qsa')
-        .where({cnpj : empresaEncontrada.cnpj})
-        .del();
+            .where({ cnpj: empresaEncontrada.cnpj })
+            .del();
 
-        const empresaExcluida2 = await knex('cnaes_secundarias')
-        .where({cnpj : empresaEncontrada.cnpj})
-        .del();
+        const cnaesExcluida = await knex('cnaes_secundarias')
+            .where({ cnpj: empresaEncontrada.cnpj })
+            .del();
 
         const empresaExcluida = await knex('empresa').where({
             id,
@@ -205,5 +368,6 @@ module.exports = {
     cadastrarEmpresa,
     listarTodasEmpresas,
     obterMinhasEmpresas,
+    atualizarEmpresa,
     excluirEmpresa
 }
