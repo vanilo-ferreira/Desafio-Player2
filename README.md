@@ -52,7 +52,7 @@ Você precisa criar um Banco de Dados PostgreSQL chamado `market_cubos` contendo
     -   Um arquivo index.js
     -   Um arquivo de conexão com o banco de dados
     -   Um arquivo de rotas
-    -   Um pasta com controladores
+    -   Um pasta com controladoresgit 
 -   Evite códigos duplicados. Antes de copiar e colar, pense se não faz sentido esse pedaço de código estar centralizado numa função.
 
 ## Endpoints obrigatórios
