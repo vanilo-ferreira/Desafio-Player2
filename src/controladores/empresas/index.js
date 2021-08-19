@@ -6,6 +6,10 @@ const cadastrarEmpresa = async (req, res) => {
     const { id } = req.usuario;
     const { cnpj } = req.body;
 
+    if (!cnpj) {
+        return res.status(404).json("O campo cnpj é obrigatório");
+    }
+
     try {
 
         const respostaBrasilApi = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
