@@ -2,6 +2,7 @@ const knex = require('../../conexao');
 const axios = require('axios');
 
 const cadastrarEmpresa = async (req, res) => {
+
     const { id } = req.usuario;
     const { cnpj } = req.body;
 
@@ -199,7 +200,9 @@ const atualizarEmpresa = async (req, res) => {
         data_exclusao_do_simples,
         opcao_pelo_mei,
         situacao_especial,
-        data_situacao_especial,
+        data_situacao_especial } = req.body.empresa;
+    const {
+        qsa_id,
         identificador_de_socio,
         nome_socio,
         cnpj_cpf_do_socio,
@@ -208,10 +211,8 @@ const atualizarEmpresa = async (req, res) => {
         data_entrada_sociedade,
         cpf_representante_legal,
         nome_representante_legal,
-        codigo_qualificacao_representante_legal,
-        codigo,
-        descricao } = req.body;
-    const { qsa_id, cnaes_id } = req.body;
+        codigo_qualificacao_representante_legal } = req.body.qsa;
+    const { cnaes_id, codigo, descricao } = req.body.cnaes;
 
     try {
 
@@ -223,97 +224,99 @@ const atualizarEmpresa = async (req, res) => {
             return res.status(404).json('Empresa não encontrada!');
         }
 
-        const atualizandoEmpresa = await knex('empresa')
-            .where({ id })
-            .update({
-                identificador_matriz_filial,
-                descricao_matriz_filial,
-                razao_social,
-                nome_fantasia,
-                situacao_cadastral,
-                descricao_situacao_cadastral,
-                data_situacao_cadastral,
-                motivo_situacao_cadastral,
-                nome_cidade_exterior,
-                codigo_natureza_juridica,
-                data_inicio_atividade,
-                cnae_fiscal,
-                cnae_fiscal_descricao,
-                descricao_tipo_logradouro,
-                logradouro,
-                numero,
-                complemento,
-                bairro,
-                cep,
-                uf,
-                codigo_municipio,
-                municipio,
-                ddd_telefone_1,
-                ddd_telefone_2,
-                ddd_fax,
-                qualificacao_do_responsavel,
-                capital_social,
-                porte,
-                descricao_porte,
-                opcao_pelo_simples,
-                data_opcao_pelo_simples,
-                data_exclusao_do_simples,
-                opcao_pelo_mei,
-                situacao_especial,
-                data_situacao_especial
-            });
-
-        if (!atualizandoEmpresa) {
-            return res.status(400).json("Os dados da empresa não foram atualizados");
-        }
-        
-        if (qsa_id) {
-            const qsaEncontrada = await knex('qsa')
-                .where({ id: qsa_id })
-                .first();
-
-            if (qsaEncontrada.cnpj !== empresaEncontrada.cnpj) {
-                return res.status(404).json('A qsa é inexistente ou não está registrada a sua empresa!');
-            }
-
-            if (!qsaEncontrada) {
-                return res.status(404).json('Empresa não encontrada!');
-            }
-
-            const qsaAtualizada = await knex('qsa')
-                .where({ id: qsaEncontrada.id })
+        if (Object.values(req.body.empresa).length !== 0) {
+            const atualizandoEmpresa = await knex('empresa')
+                .where({ id })
                 .update({
-                    identificador_de_socio,
-                    nome_socio,
-                    cnpj_cpf_do_socio,
-                    codigo_qualificacao_socio,
-                    percentual_capital_social,
-                    data_entrada_sociedade,
-                    cpf_representante_legal,
-                    nome_representante_legal,
-                    codigo_qualificacao_representante_legal
+                    identificador_matriz_filial,
+                    descricao_matriz_filial,
+                    razao_social,
+                    nome_fantasia,
+                    situacao_cadastral,
+                    descricao_situacao_cadastral,
+                    data_situacao_cadastral,
+                    motivo_situacao_cadastral,
+                    nome_cidade_exterior,
+                    codigo_natureza_juridica,
+                    data_inicio_atividade,
+                    cnae_fiscal,
+                    cnae_fiscal_descricao,
+                    descricao_tipo_logradouro,
+                    logradouro,
+                    numero,
+                    complemento,
+                    bairro,
+                    cep,
+                    uf,
+                    codigo_municipio,
+                    municipio,
+                    ddd_telefone_1,
+                    ddd_telefone_2,
+                    ddd_fax,
+                    qualificacao_do_responsavel,
+                    capital_social,
+                    porte,
+                    descricao_porte,
+                    opcao_pelo_simples,
+                    data_opcao_pelo_simples,
+                    data_exclusao_do_simples,
+                    opcao_pelo_mei,
+                    situacao_especial,
+                    data_situacao_especial
                 });
+
+            if (!atualizandoEmpresa) {
+                return res.status(400).json("Os dados da empresa não foram atualizados");
+            }
         }
 
-        if (cnaes_id) {
-            const cnaesEncontrada = await knex('cnaes_secundarias')
-                .where({ id: cnaes_id })
-                .first();
+        if (Object.values(req.body.qsa).length !== 0) {
+            if (qsa_id) {
+                const qsaEncontrada = await knex('qsa')
+                    .where({ id: qsa_id })
+                    .first();
 
-            if (cnaesEncontrada.cnpj !== empresaEncontrada.cnpj) {
-                return res.status(404).json('A qsa é inexistente ou não está registrada a sua empresa!');
+                if (qsaEncontrada.cnpj !== empresaEncontrada.cnpj || !qsaEncontrada.cnpj) {
+                    return res.status(404).json('A qsa não foi encontrada ou não está registrada a sua empresa!');
+                }
+
+                const qsaAtualizada = await knex('qsa')
+                    .where({ id: qsaEncontrada.id })
+                    .update({
+                        identificador_de_socio,
+                        nome_socio,
+                        cnpj_cpf_do_socio,
+                        codigo_qualificacao_socio,
+                        percentual_capital_social,
+                        data_entrada_sociedade,
+                        cpf_representante_legal,
+                        nome_representante_legal,
+                        codigo_qualificacao_representante_legal
+                    });
+            } else {
+                return res.status(404).json('Se deseja alterar a qsa de uma empresa. O id da qsa que deseja alterar é obrigatório!');
             }
+        }
 
-            if (!cnaesEncontrada) {
-                return res.status(404).json('Empresa não encontrada!');
+        if (Object.values(req.body.cnaes).length !== 0) {
+            if (cnaes_id) {
+                const cnaesEncontrada = await knex('cnaes_secundarias')
+                    .where({ id: cnaes_id })
+                    .first();
+
+                if (cnaesEncontrada.cnpj !== empresaEncontrada.cnpj || !cnaesEncontrada) {
+                    return res.status(404).json('A qsa é inexistente ou não está registrada a sua empresa!');
+                }
+
+                const cnaesAtualizada = await knex('cnaes_secundarias')
+                    .where({ id: cnaesEncontrada.id })
+                    .update({
+                        codigo,
+                        descricao
+                    });
+            } else {
+                return res.status(404).json('Se deseja alterar alguma cnaes secundária de uma empresa. O id da cnaes secundária que deseja alterar é obrigatório!');
             }
-
-            const cnaesAtualizada = await knex('cnaes_secundarias')
-                .where({ id: cnaesEncontrada.id })
-                .update({
-                    codigo,
-                    descricao
-                });
         }
 
         return res.status(200).json('Empresa atualizada com sucesso');
