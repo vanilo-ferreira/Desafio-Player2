@@ -161,6 +161,43 @@ const obterMinhasEmpresas = async (req, res) => {
 
 }
 
+const obterUmaEmpresa = async (req, res) => {
+
+    const { id } = req.params;
+    const { usuario } = req;
+
+    try {
+
+        const empresaEncontrada = await knex('empresa')
+            .select('*')
+            .where({ id, usuario_id: usuario.id })
+            .first();
+
+        if (!empresaEncontrada) {
+            return res.status(404).json('Empresa não encontrada');
+        }
+
+        for (empresa of empresaEncontrada) {
+
+            const qsa = await knex('qsa')
+                .where({ cnpj: empresa.cnpj })
+                .select("*");
+            empresa.qsa = qsa;
+
+            const cnaesSecundarias = await knex('cnaes_secundarias')
+                .where({ cnpj: empresa.cnpj })
+                .select("*");
+            empresa.cnaes_secundarias = cnaesSecundarias;
+        }
+
+        return res.status(200).json(empresaEncontrada);
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+
+}
+
 const atualizarEmpresa = async (req, res) => {
 
     const { usuario } = req;
@@ -276,8 +313,8 @@ const atualizarEmpresa = async (req, res) => {
                     .where({ id: qsa_id })
                     .first();
 
-                if (qsaEncontrada.cnpj !== empresaEncontrada.cnpj || !qsaEncontrada.cnpj) {
-                    return res.status(404).json('A qsa não foi encontrada ou não está registrada a sua empresa!');
+                if (!qsaEncontrada.cnpj || qsaEncontrada.cnpj !== empresaEncontrada.cnpj) {
+                    return res.status(404).json('A qsa não foi encontrada ou não está registrada atrelada a sua empresa!');
                 }
 
                 const qsaAtualizada = await knex('qsa')
@@ -304,8 +341,9 @@ const atualizarEmpresa = async (req, res) => {
                     .where({ id: cnaes_id })
                     .first();
 
-                if (cnaesEncontrada.cnpj !== empresaEncontrada.cnpj || !cnaesEncontrada) {
-                    return res.status(404).json('A qsa é inexistente ou não está registrada a sua empresa!');
+
+                if (!cnaesEncontrada || cnaesEncontrada.cnpj !== empresaEncontrada.cnpj) {
+                    return res.status(404).json('A cnaes é inexistente ou não está atrelada a sua empresa!');
                 }
 
                 const cnaesAtualizada = await knex('cnaes_secundarias')
@@ -371,6 +409,7 @@ module.exports = {
     cadastrarEmpresa,
     listarTodasEmpresas,
     obterMinhasEmpresas,
+    obterUmaEmpresa,
     atualizarEmpresa,
     excluirEmpresa
 }
