@@ -20,7 +20,7 @@ rotas.post('/empresas', empresas.cadastrarEmpresa);
 rotas.get('/empresas', empresas.listarTodasEmpresas);
 rotas.get('/minhasEmpresas', empresas.obterMinhasEmpresas);
 rotas.get('/minhasEmpresas/:id', empresas.obterUmaEmpresa);
-rotas.post('/minhasEmpresas/:id', empresas.atualizarEmpresa);
+rotas.patch('/minhasEmpresas/:id', empresas.atualizarEmpresa);
 rotas.delete('/excluirEmpresa/:id', empresas.excluirEmpresa);
 
 module.exports = rotas;

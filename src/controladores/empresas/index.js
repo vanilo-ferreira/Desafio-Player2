@@ -174,21 +174,19 @@ const obterUmaEmpresa = async (req, res) => {
             .first();
 
         if (!empresaEncontrada) {
-            return res.status(404).json('Empresa não encontrada');
+            return res.status(404).json('Empresa não encontrada!');
         }
 
-        for (empresa of empresaEncontrada) {
 
             const qsa = await knex('qsa')
-                .where({ cnpj: empresa.cnpj })
+                .where({ cnpj: empresaEncontrada.cnpj })
                 .select("*");
-            empresa.qsa = qsa;
+            empresaEncontrada.qsa = qsa;
 
             const cnaesSecundarias = await knex('cnaes_secundarias')
-                .where({ cnpj: empresa.cnpj })
+                .where({ cnpj: empresaEncontrada.cnpj })
                 .select("*");
-            empresa.cnaes_secundarias = cnaesSecundarias;
-        }
+            empresaEncontrada.cnaes_secundarias = cnaesSecundarias;
 
         return res.status(200).json(empresaEncontrada);
 
